@@ -18,18 +18,23 @@ questions = [
 # Initialize variables
 users = []
 current_question = 0
+quiz_started = False  # To track if the admin has started the quiz
 
 # Streamlit app
 st.title('Quiz App')
 
-# User registration
-user_name = st.text_input('Enter your name:')
-if user_name:
-    users.append({'name': user_name, 'score': 0})
-    st.success(f'Welcome, {user_name}!')
+# Admin control
+admin_start = st.button('Start Quiz (Admin Only)')
 
-if len(users) > 0:
-    if current_question < 10:  # Allow a total of 10 questions
+if admin_start:
+    quiz_started = True
+    st.success('The quiz has started!')
+
+if not quiz_started:
+    st.warning('The quiz has not started yet. Only the admin can start it.')
+
+if len(users) > 0 and quiz_started:
+    if current_question < len(questions):  # Show all questions to users once the quiz starts
         st.write(f'Question {current_question + 1}: {questions[current_question]["question"]}')
         options = questions[current_question]['options']
 
