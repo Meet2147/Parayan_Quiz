@@ -32,7 +32,17 @@ if len(users) > 0:
     if current_question < 10:  # Allow a total of 10 questions
         st.write(f'Question {current_question + 1}: {questions[current_question]["question"]}')
         options = questions[current_question]['options']
-        selected_option = st.radio('Choose an option:', options)
+
+        # Use caching to store the selected answer
+        selected_option = st.radio('Choose an option:', options, key=current_question)
+
+        # Check if this is the first time the question is displayed
+        if st.session_state.get(f'selected_option_{current_question}') is None:
+            st.session_state[f'selected_option_{current_question}'] = selected_option
+
+        # Check if the selected answer has changed
+        if selected_option != st.session_state[f'selected_option_{current_question}']:
+            st.warning("You cannot change your answer once selected. Your original answer will be considered.")
 
         if selected_option == questions[current_question]['correct_option']:
             st.write('Correct!')
