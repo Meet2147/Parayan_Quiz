@@ -1,3 +1,4 @@
+
 import streamlit as st
 import random
 import pandas as pd
@@ -28,7 +29,7 @@ quiz_in_progress = False
 start_time = None
 
 # Load leaderboard data from a CSV file (or database) if available.
-leaderboard_data = pd.read_csv('leaderboard.csv') if 'leaderboard.csv' in st.secrets else pd.DataFrame(columns=['User', 'Score'])
+leaderboard_data = pd.DataFrame(columns=['User', 'Score'])
 
 # Streamlit app header.
 st.title('Quiz App')
