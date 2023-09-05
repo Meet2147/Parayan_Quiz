@@ -1,70 +1,55 @@
 import streamlit as st
+import random
 
-# Define quiz questions and answers
+# Define a list of sample questions and answers (you can replace these with your own data).
 questions = [
     {
         'question': 'What is the capital of France?',
-        'options': ['Berlin', 'Madrid', 'Paris', 'Rome'],
-        'correct_option': 'Paris'
+        'options': ['Paris', 'London', 'Berlin'],
+        'correct_answer': 'Paris',
     },
     {
         'question': 'Which planet is known as the Red Planet?',
-        'options': ['Venus', 'Mars', 'Jupiter', 'Saturn'],
-        'correct_option': 'Mars'
+        'options': ['Earth', 'Mars', 'Venus'],
+        'correct_answer': 'Mars',
     },
-    # Add more questions here
+    # Add more questions here...
 ]
 
-# Initialize variables
-users = []
-current_question = 0
-quiz_started = False  # To track if the admin has started the quiz
+# Initialize variables to track the user's score and current question.
+user_score = 0
+current_question_index = 0
 
-# Streamlit app
+# Shuffle the questions for randomness.
+random.shuffle(questions)
+
+# Streamlit app header.
 st.title('Quiz App')
 
-# Admin control
-admin_start = st.button('Start Quiz (Admin Only)')
+# Function to display a question and collect user's answer.
+def display_question():
+    global current_question_index, user_score
+    if current_question_index < len(questions):
+        question_data = questions[current_question_index]
+        st.subheader(f'Question {current_question_index + 1}: {question_data["question"]}')
+        selected_option = st.radio('Select an option:', question_data['options'])
+        
+        if st.button('Submit Answer'):
+            if selected_option == question_data['correct_answer']:
+                user_score += 10
+            else:
+                user_score += 1
+            current_question_index += 1
 
-if admin_start:
-    quiz_started = True
-    st.success('The quiz has started!')
+# Main quiz interface.
+if current_question_index < len(questions):
+    display_question()
+else:
+    st.subheader('Quiz Finished!')
+    st.write(f'Your Score: {user_score}')
 
-if not quiz_started:
-    st.warning('The quiz has not started yet. Only the admin can start it.')
-
-if len(users) > 0 and quiz_started:
-    if current_question < len(questions):  # Show all questions to users once the quiz starts
-        st.write(f'Question {current_question + 1}: {questions[current_question]["question"]}')
-        options = questions[current_question]['options']
-
-        # Use caching to store the selected answer
-        selected_option = st.radio('Choose an option:', options, key=current_question)
-
-        # Check if this is the first time the question is displayed
-        if st.session_state.get(f'selected_option_{current_question}') is None:
-            st.session_state[f'selected_option_{current_question}'] = selected_option
-
-        # Check if the selected answer has changed
-        if selected_option != st.session_state[f'selected_option_{current_question}']:
-            st.warning("You cannot change your answer once selected. Your original answer will be considered.")
-
-        if selected_option == questions[current_question]['correct_option']:
-            st.write('Correct!')
-            # Update the user's score
-            users[-1]['score'] += 1
-        else:
-            st.write(f'Incorrect! The correct answer is {questions[current_question]["correct_option"]}')
-
-        current_question += 1
-    else:
-        st.write('Quiz completed!')
-        st.write(f'Your score: {users[-1]["score"]}/{len(questions)}')
-
-# Display user scores
-if users:
-    st.write('\n**User Scores:**')
-    for user in users:
-        st.write(f'{user["name"]}: {user["score"]}')
-
-st.write('Thank you for playing!')
+# Add a button to restart the quiz.
+if st.button('Restart Quiz'):
+    current_question_index = 0
+    user_score = 0
+    random.shuffle(questions)
